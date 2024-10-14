@@ -1,0 +1,38 @@
+spec:
+  name: do-app-action-nyc
+  region: nyc
+
+  alerts:
+    - rule: DEPLOYMENT_LIVE
+    - rule: DEPLOYMENT_FAILED
+
+  features:
+    - enable-kata-build
+
+  static_sites:
+    - build_command: npm run build
+      environment_slug: node-js
+      envs:
+        - key: GITHUB_TOKEN
+          scope: BUILD_TIME
+          type: SECRET
+        - key: BUILD_ID
+          scope: BUILD_TIME
+          value: ${_self.COMMIT_HASH}
+      github:
+        branch: production
+        deploy_on_push: true
+        repo: ntheanh201/digitalocean-app-action
+      name: do-app-action-production-nyc
+      output_dir: out
+      routes:
+        - path: /
+      source_dir: /
+
+  ingress:
+    rules:
+      - component:
+          name: do-app-action-nyc
+        match:
+          path:
+            prefix: /
